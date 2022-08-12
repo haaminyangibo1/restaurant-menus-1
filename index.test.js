@@ -1,8 +1,9 @@
 const {db} = require('./db')
-const {Restaurant, Menu} = require('./models/index')
+const {Restaurant, Menu, Item} = require('./models/index')
 const {
     seedRestaurant,
     seedMenu,
+    seedItem,
   } = require('./seedData');
 
 describe('Restaurant and Menu Models', () => {
@@ -28,6 +29,7 @@ describe('Restaurant and Menu Models', () => {
 
     test('can find Restaurants', async () => {
         const findRestaurant = await Restaurant.findAll()
+
         expect(findRestaurant.length).toEqual(1)
         expect(findRestaurant[0].name).toEqual(seedRestaurant[0].name)
     });
@@ -61,14 +63,51 @@ describe('Restaurant and Menu Models', () => {
         title: 'Gyoza'
          })
 
+        let oldMenu = await Menu.create({
+            title: 'Noodles'
+             })
+    
+
         await newRestaurant.addMenu(newMenu);
+        await newRestaurant.addMenu(oldMenu);
+
+        // const menus = await newRestaurant.getMenu()
 
         const menus = await newRestaurant.getMenus()
-
+        
         expect(menus[0] instanceof Menu ).toBe(true)
-        expect(menus[0] instanceof Menu).toBeTruthy
-        exepct(menus[0].title).toEqual(newMenu[0].title)
-        expect(menus.length).toBe(1)
+        // expect(menus[1] instanceof Menu).toBeTruthy
+
+        // expect(menus[0].title).toEqual(newMenu.title)
+
+        // expect(menus.length).toBe(2)
+
+    })
+
+    test('Menu can have many items, Item can have many menus', async () =>{
+        //Make a menu 
+        //make an item
+        // add item menu
+        //check if item is attached to menu
+
+        let breakfast = await Menu.create(seedMenu[0])
+        let lunch = await Menu.create(seedMenu[1])
+
+        let hamburger = await Item.create(seedItem[2])
+        let masala = await Item.create(seedItem[0])
+
+        await breakfast.addItem(masala)
+        await lunch.addItem(hamburger)
+
+        const items = await breakfast.getItems()
+
+        expect(items[0] instanceof Item ).toBe(true);
+        // expect(items[0] instanceof Item ).toBe(seedItem[0]);
+
+
+
+
+
 
     })
 })
